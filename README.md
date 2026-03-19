@@ -121,3 +121,6 @@
 |   | 南极大冒险 (J) Antarctic Adventure | roms/(J) Antarctic Adventure [!].nes | 
 |   | 叮当1 (J) Dig Dug | roms/(J) Dig Dug [!].nes | 
 |   | 影之传说 (J) Kage no Densetsu [!] | roms/(J) Kage no Densetsu [!].nes | 
+
+## Star History
+[![Star History Chart](https://api.star-history.com/svg?repos=lucaschungzsj/fcgame&type=Date)](https://star-history.com/#lucaschungzsj/fcgame&Date)
