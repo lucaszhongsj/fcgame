@@ -351,4 +351,14 @@ button.left.joydirection {
 
 @media screen and (orientation: landscape) {
     /*æ¨ªå± css*/
+    .screen {
+        align-items: flex-start;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .screen #emulator {
+        height: auto !important;
+        min-height: 100%;
+    }
 }

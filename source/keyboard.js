@@ -54,10 +54,10 @@ JSNES.Keyboard.prototype = {
             case 32: this.state1[this.keys.KEY_SELECT] = value; break; // SELECT: SPACE(32)
             case 13: this.state1[this.keys.KEY_START] = value; break;  // START: ENTER(13)
             // Player2
-            case 87: this.state1[this.keys.KEY_UP] = value; break;     // Up 38
-            case 83: this.state1[this.keys.KEY_DOWN] = value; break;   // Down 40
-            case 65: this.state1[this.keys.KEY_LEFT] = value; break;   // Left 37
-            case 68: this.state1[this.keys.KEY_RIGHT] = value; break;  // Right 39
+            case 38: this.state2[this.keys.KEY_UP] = value; break;     // UP: ↑(38)
+            case 40: this.state2[this.keys.KEY_DOWN] = value; break;   // DOWN: ↓(40)
+            case 37: this.state2[this.keys.KEY_LEFT] = value; break;   // LEFT: ←(37)
+            case 39: this.state2[this.keys.KEY_RIGHT] = value; break;  // RIGHT: →(39)
             case 98: this.state2[this.keys.KEY_B] = value; break;     // B: Num2(98)
             case 97: this.state2[this.keys.KEY_A] = value; break;     // A: Num1(97)
             case 111: this.state2[this.keys.KEY_SELECT] = value; break; // SELECT: NumpadDivide(111)
