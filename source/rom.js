@@ -202,9 +202,18 @@ JSNES.ROM.prototype = {
         }
         return "Unknown Mapper, "+this.mapperType;
     },
+
+    // 当前仓库中存在占位实现但未达可用标准的 mapper。
+    explicitlyUnsupportedMappers: {
+        5: true
+    },
+
+    mapperExplicitlyUnsupported: function() {
+        return !!this.explicitlyUnsupportedMappers[this.mapperType];
+    },
     
     mapperSupported: function() {
-        return typeof JSNES.Mappers[this.mapperType] !== 'undefined';
+        return !this.mapperExplicitlyUnsupported() && typeof JSNES.Mappers[this.mapperType] !== 'undefined';
     },
     
     createMapper: function() {
@@ -212,6 +221,10 @@ JSNES.ROM.prototype = {
             return new JSNES.Mappers[this.mapperType](this.nes);
         }
         else {
+            if (this.mapperExplicitlyUnsupported()) {
+                this.nes.ui.updateStatus("This ROM uses a mapper explicitly unsupported in this build: "+this.getMapperName()+"("+this.mapperType+")");
+                return null;
+            }
             this.nes.ui.updateStatus("This ROM uses a mapper not supported by JSNES: "+this.getMapperName()+"("+this.mapperType+")");
             return null;
         }

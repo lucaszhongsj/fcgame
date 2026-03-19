@@ -103,12 +103,8 @@ if (typeof jQuery !== 'undefined') {
                         'max-height': document.documentElement.clientHeight,
                     })
                 })
-                if (/(IPHONE|IPAD|ANDROID)/i.test(navigator.userAgent)) {
-                    $('#pc-controlls').hide();
-                } else {
+                if (!/(IPHONE|IPAD|ANDROID)/i.test(navigator.userAgent)) {
                     self.buttons.zoom.attr("disabled", "disabled");
-                    $('#mobile-controlls').hide();
-                    $('.shang').removeClass('anim_m').addClass('pc');
                 }
 
                 self.buttons.zoom.click(function() {
@@ -197,191 +193,97 @@ if (typeof jQuery !== 'undefined') {
                 $('#controls-direction').bind('touchstart', function(e) {
                     handleDirection(e);
                     e.preventDefault();
-                })
+                });
                 $('#controls-direction').bind('gesturestart', function(e) {
                     handleDirection(e);
                     e.preventDefault();
-                })
+                });
                 $('#controls-direction').bind('touchmove', function(e) {
                     handleDirection(e);
-                })
+                    e.preventDefault();
+                });
 
-                function handleDirection(e) {
-                    var myLocation = e.originalEvent.changedTouches[0];
-                    var realTarget = document.elementFromPoint(myLocation.clientX, myLocation.clientY);
-                    if ($(realTarget).hasClass('leftup')) {
-                        $('#controls-direction .left').addClass('active');
-                        $('#controls-direction .up').addClass('active');
-                        $('#controls-direction .down').removeClass('active');
-                        $('#controls-direction .right').removeClass('active');
-                        self.nes.keyboard.keyDown({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('up')) {
-                        $('#controls-direction .left').removeClass('active');
-                        $('#controls-direction .up').addClass('active');
-                        $('#controls-direction .down').removeClass('active');
-                        $('#controls-direction .right').removeClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('rightup')) {
-                        $('#controls-direction .left').removeClass('active');
-                        $('#controls-direction .up').addClass('active');
-                        $('#controls-direction .down').removeClass('active');
-                        $('#controls-direction .right').addClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('left')) {
-                        $('#controls-direction .left').addClass('active');
-                        $('#controls-direction .up').removeClass('active');
-                        $('#controls-direction .down').removeClass('active');
-                        $('#controls-direction .right').removeClass('active');
-                        self.nes.keyboard.keyDown({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('center')) {
-                        $('#controls-direction .left').removeClass('active');
-                        $('#controls-direction .up').removeClass('active');
-                        $('#controls-direction .down').removeClass('active');
-                        $('#controls-direction .right').removeClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('right')) {
-                        $('#controls-direction .left').removeClass('active');
-                        $('#controls-direction .up').removeClass('active');
-                        $('#controls-direction .down').removeClass('active');
-                        $('#controls-direction .right').addClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('leftdown')) {
-                        $('#controls-direction .left').addClass('active');
-                        $('#controls-direction .up').removeClass('active');
-                        $('#controls-direction .down').addClass('active');
-                        $('#controls-direction .right').removeClass('active');
-                        self.nes.keyboard.keyDown({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('down')) {
-                        $('#controls-direction .left').removeClass('active');
-                        $('#controls-direction .up').removeClass('active');
-                        $('#controls-direction .down').addClass('active');
-                        $('#controls-direction .right').removeClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 40
-                        });
-                    } else if ($(realTarget).hasClass('rightdown')) {
-                        $('#controls-direction .left').removeClass('active');
-                        $('#controls-direction .up').removeClass('active');
-                        $('#controls-direction .down').addClass('active');
-                        $('#controls-direction .right').addClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 37
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 38
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 39
-                        });
-                        self.nes.keyboard.keyDown({
-                            keyCode: 40
-                        });
-                    }
-
-                }
-                $('#controls-direction').bind('touchend', function(e) {
+                function resetDirectionButtons() {
                     $('#controls-direction .left').removeClass('active');
                     $('#controls-direction .up').removeClass('active');
                     $('#controls-direction .down').removeClass('active');
                     $('#controls-direction .right').removeClass('active');
+                }
+
+                function releaseDirectionKeys() {
                     self.nes.keyboard.keyUp({
-                        keyCode: 37
+                        keyCode: 87
                     });
                     self.nes.keyboard.keyUp({
-                        keyCode: 38
+                        keyCode: 83
                     });
                     self.nes.keyboard.keyUp({
-                        keyCode: 39
+                        keyCode: 65
                     });
                     self.nes.keyboard.keyUp({
-                        keyCode: 40
+                        keyCode: 68
                     });
+                }
+
+                function getDirectionName(realTarget) {
+                    if ($(realTarget).hasClass('up')) {
+                        return 'up';
+                    }
+                    if ($(realTarget).hasClass('down')) {
+                        return 'down';
+                    }
+                    if ($(realTarget).hasClass('left')) {
+                        return 'left';
+                    }
+                    if ($(realTarget).hasClass('right')) {
+                        return 'right';
+                    }
+                    return null;
+                }
+
+                function pressDirection(directionName) {
+                    resetDirectionButtons();
+                    $('#controls-direction .' + directionName).addClass('active');
+                    releaseDirectionKeys();
+                    switch (directionName) {
+                        case 'up':
+                            self.nes.keyboard.keyDown({
+                                keyCode: 87
+                            });
+                            break;
+                        case 'down':
+                            self.nes.keyboard.keyDown({
+                                keyCode: 83
+                            });
+                            break;
+                        case 'left':
+                            self.nes.keyboard.keyDown({
+                                keyCode: 65
+                            });
+                            break;
+                        case 'right':
+                            self.nes.keyboard.keyDown({
+                                keyCode: 68
+                            });
+                            break;
+                    }
+                }
+
+                function handleDirection(e) {
+                    var myLocation = e.originalEvent.changedTouches[0];
+                    var realTarget = document.elementFromPoint(myLocation.clientX, myLocation.clientY);
+                    var directionName = getDirectionName(realTarget);
+                    if (!directionName) {
+                        resetDirectionButtons();
+                        releaseDirectionKeys();
+                        return;
+                    }
+                    pressDirection(directionName);
+                }
+                $('#controls-direction').bind('touchend', function(e) {
+                    resetDirectionButtons();
+                    releaseDirectionKeys();
+                    e.preventDefault();
                 });
 
                 $('#joystick_btn_up').bind('touchstart', function(e) {
@@ -466,14 +368,14 @@ if (typeof jQuery !== 'undefined') {
                 $('#joystick_btn_select').bind('touchstart', function(e) {
                     console.log("select");
                     self.nes.keyboard.keyDown({
-                        keyCode: 17
+                        keyCode: 32
                     });
                     $('#joystick_btn_select').addClass('active');
                     e.preventDefault();
                 });
                 $('#joystick_btn_select').bind('touchend', function(e) {
                     self.nes.keyboard.keyUp({
-                        keyCode: 17
+                        keyCode: 32
                     });
                     $('#joystick_btn_select').removeClass('active');
                     e.preventDefault();
@@ -499,7 +401,7 @@ if (typeof jQuery !== 'undefined') {
                     e.preventDefault();
                 });
                 $('#controls-fire').bind('gesturestart', function(e) {
-                    handleFire(e, true);
+                    handleFire(e);
                     e.preventDefault();
                 });
                 $('#controls-fire').bind('touchmove', function(e) {
@@ -507,135 +409,58 @@ if (typeof jQuery !== 'undefined') {
                     e.preventDefault();
                 });
                 $('#controls-fire').bind('touchend', function(e) {
-                    clearInterval(self.interval);
-                    $('#controls-fire .a').removeClass('active');
-                    $('#controls-fire .b').removeClass('active');
-                    self.nes.keyboard.keyUp({
-                        keyCode: 88
-                    });
-                    self.nes.keyboard.keyUp({
-                        keyCode: 90
-                    });
-                    e.preventDefault();
-                });
-                $('#controls-turbofire').bind('touchstart', function(e) {
-                    handleFire(e, true);
-                    e.preventDefault();
-                });
-                $('#controls-turbofire').bind('gesturestart', function(e) {
-                    handleFire(e, true);
-                    e.preventDefault();
-                });
-                $('#controls-turbofire').bind('touchmove', function(e) {
-                    handleFire(e, true);
-                    e.preventDefault();
-                });
-                $('#controls-turbofire').bind('touchend', function(e) {
-                    clearInterval(self.interval);
-                    $('#controls-turbofire .a').removeClass('active');
-                    $('#controls-turbofire .b').removeClass('active');
-                    self.nes.keyboard.keyUp({
-                        keyCode: 88
-                    });
-                    self.nes.keyboard.keyUp({
-                        keyCode: 90
-                    });
+                    releaseFireKeys();
+                    resetFireButtons();
                     e.preventDefault();
                 });
 
-                function handleFire(e, turbo) {
-                    var parent = $('#controls-fire');
-                    if (turbo) {
-                        parent = $('#controls-turbofire');
-                    }
+                function resetFireButtons() {
+                    $('#controls-fire .a').removeClass('active');
+                    $('#controls-fire .b').removeClass('active');
+                }
+
+                function releaseFireKeys() {
+                    self.nes.keyboard.keyUp({
+                        keyCode: 74
+                    });
+                    self.nes.keyboard.keyUp({
+                        keyCode: 75
+                    });
+                }
+
+                function handleFire(e) {
                     var myLocation = e.originalEvent.changedTouches[0];
                     var realTarget = document.elementFromPoint(myLocation.clientX, myLocation.clientY);
                     if ($(realTarget).hasClass('a')) {
-                        $('.a', parent).addClass('active');
-                        $('.b', parent).removeClass('active');
-                        clearInterval(self.interval);
-                        if (turbo) {
-                            self.nes.keyboard.keyDown({
-                                keyCode: 'AA'
-                            });
-                            self.nes.keyboard.keyUp({
-                                keyCode: 90
-                            });
-                            self.interval = setInterval(function() {
-                                self.nes.keyboard.keyDown({
-                                    keyCode: 'AA'
-                                });
-                            }, 50);
-                        } else {
-                            self.nes.keyboard.keyDown({
-                                keyCode: 88
-                            });
-                            self.nes.keyboard.keyUp({
-                                keyCode: 90
-                            });
-                        }
+                        $('#controls-fire .a').addClass('active');
+                        $('#controls-fire .b').removeClass('active');
+                        self.nes.keyboard.keyDown({
+                            keyCode: 74
+                        });
+                        self.nes.keyboard.keyUp({
+                            keyCode: 75
+                        });
                     } else if ($(realTarget).hasClass('b')) {
-                        $('.a', parent).removeClass('active');
-                        $('.b', parent).addClass('active');
-                        clearInterval(self.interval);
-                        if (turbo) {
-                            self.nes.keyboard.keyUp({
-                                keyCode: 88
-                            });
-                            self.nes.keyboard.keyDown({
-                                keyCode: 'BB'
-                            });
-                            self.interval = setInterval(function() {
-                                self.nes.keyboard.keyDown({
-                                    keyCode: 'BB'
-                                });
-                            }, 50);
-                        } else {
-                            self.nes.keyboard.keyUp({
-                                keyCode: 88
-                            });
-                            self.nes.keyboard.keyDown({
-                                keyCode: 90
-                            });
-                        }
+                        $('#controls-fire .a').removeClass('active');
+                        $('#controls-fire .b').addClass('active');
+                        self.nes.keyboard.keyUp({
+                            keyCode: 74
+                        });
+                        self.nes.keyboard.keyDown({
+                            keyCode: 75
+                        });
                     } else if ($(realTarget).hasClass('c')) {
-                        $('.a', parent).addClass('active');
-                        $('.b', parent).addClass('active');
-                        clearInterval(self.interval);
-                        if (turbo) {
-                            self.nes.keyboard.keyDown({
-                                keyCode: 'AA'
-                            });
-                            self.nes.keyboard.keyDown({
-                                keyCode: 'BB'
-                            });
-                            self.interval = setInterval(function() {
-                                self.nes.keyboard.keyDown({
-                                    keyCode: 'AA'
-                                });
-                                self.nes.keyboard.keyDown({
-                                    keyCode: 'BB'
-                                });
-                            }, 50);
-                        } else {
-                            self.nes.keyboard.keyDown({
-                                keyCode: 88
-                            });
-                            self.nes.keyboard.keyDown({
-                                keyCode: 90
-                            });
-                        }
+                        $('#controls-fire .a').addClass('active');
+                        $('#controls-fire .b').addClass('active');
+                        self.nes.keyboard.keyDown({
+                            keyCode: 74
+                        });
+                        self.nes.keyboard.keyDown({
+                            keyCode: 75
+                        });
                     } else {
-                        clearInterval(self.interval);
-                        $('.a', parent).removeClass('active');
-                        $('.b', parent).removeClass('active');
-                        self.nes.keyboard.keyUp({
-                            keyCode: 88
-                        });
-                        self.nes.keyboard.keyUp({
-                            keyCode: 90
-                        });
-
+                        resetFireButtons();
+                        releaseFireKeys();
                     }
                 }
 

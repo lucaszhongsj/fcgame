@@ -67,7 +67,17 @@
 <script src="source/ppu.js" type="text/javascript" charset="utf-8"></script>
 <script src="source/rom.js" type="text/javascript" charset="utf-8"></script>
 <script src="source/ui.js" type="text/javascript" charset="utf-8"></script>
-<script src="lib/debug.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript" charset="utf-8">
+    (function() {
+        if (window.location.search.indexOf("antiDebug=1") === -1) {
+            return;
+        }
+        var debugScript = document.createElement("script");
+        debugScript.src = "lib/debug.js";
+        debugScript.charset = "utf-8";
+        document.body.appendChild(debugScript);
+    }());
+</script>
 <script src="lib/nipplejs.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/joystick.js" type="text/javascript" charset="utf-8"></script>
 <script src="lib/jweixin-1.6.0.js" type="text/javascript" charset="utf-8"></script>
