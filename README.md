@@ -122,5 +122,16 @@
 |   | 叮当1 (J) Dig Dug | roms/(J) Dig Dug [!].nes | 
 |   | 影之传说 (J) Kage no Densetsu [!] | roms/(J) Kage no Densetsu [!].nes | 
 
+## Docker 部署
+
+在仓库根目录执行以下命令即可本地运行：
+
+```bash
+docker build -t fcgame:local .
+docker run --rm -p 8080:80 fcgame:local
+```
+
+浏览器访问：`http://localhost:8080`
+
 ## Star History
 [![Star History Chart](https://api.star-history.com/svg?repos=lucaschungzsj/fcgame&type=Date)](https://star-history.com/#lucaschungzsj/fcgame&Date)
