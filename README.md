@@ -20,8 +20,8 @@
 | Down | S | ↓ |
 | Left | A | ← |
 | Right | D | → |
-| B | J | Num1 |
-| A | K | Num2 |
+| B | K | Num2 |
+| A | J | Num1 |
 | Select | Space | Num/ |
 | Start | Enter | Num* |
 
