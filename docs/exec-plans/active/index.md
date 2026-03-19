@@ -1,4 +1,6 @@
 # active 计划索引
 
-当前暂无正在执行的正式计划文档。  
-如果开启新计划，请在本目录新增单独文件，并在 `docs/PLANS.md` 建立链接。
+## 进行中计划
+
+- [2026-03-19-enhancement-issues-5-8-spec.md](./2026-03-19-enhancement-issues-5-8-spec.md)
+- [2026-03-19-enhancement-issues-5-8-plan.md](./2026-03-19-enhancement-issues-5-8-plan.md)

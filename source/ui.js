@@ -661,9 +661,29 @@ if (typeof jQuery !== 'undefined') {
             UI.prototype = {
                 loadROM: function() {
                     var self = this;
+                    var romLoadHelpers = (JSNES && JSNES.romLoadHelpers) ? JSNES.romLoadHelpers : {
+                        getRomRequestUrl: function(selectedUrl) {
+                            return selectedUrl;
+                        },
+                        shouldStartRomFromAjaxResult: function(textStatus, status, data) {
+                            return textStatus === "success" && status >= 200 && status < 300 && !!data;
+                        },
+                        getRomLoadErrorMessage: function(options) {
+                            var protocol = options && options.protocol ? options.protocol : "";
+                            var url = options && options.url ? options.url : "";
+                            var status = options && typeof options.status === "number" ? options.status : 0;
+                            var textStatus = options && options.textStatus ? options.textStatus : "error";
+
+                            if (protocol === "file:") {
+                                return "ROM 加载失败：当前使用 file:// 协议，请使用本地 HTTP 服务启动页面后再重试。";
+                            }
+                            return "ROM 加载失败（" + status + " / " + textStatus + "）：" + url;
+                        }
+                    };
+                    var romUrl = self.romSelect.val();
                     self.updateStatus("Downloading...");
                     $.ajax({
-                        url: escape(self.romSelect.val()),
+                        url: romLoadHelpers.getRomRequestUrl(romUrl),
                         xhr: function() {
                             var xhr = $.ajaxSettings.xhr();
                             if (typeof xhr.overrideMimeType !== 'undefined') {
@@ -673,22 +693,39 @@ if (typeof jQuery !== 'undefined') {
                             self.xhr = xhr;
                             return xhr;
                         },
-                        complete: function(xhr, status) {
-                            var i, data;
+                        success: function(data, textStatus, xhr) {
+                            var romData = data;
+                            if (!romLoadHelpers.shouldStartRomFromAjaxResult(textStatus, xhr.status, romData)) {
+                                self.updateStatus(romLoadHelpers.getRomLoadErrorMessage({
+                                    protocol: window.location.protocol,
+                                    url: romUrl,
+                                    status: xhr && typeof xhr.status === "number" ? xhr.status : 0,
+                                    textStatus: textStatus
+                                }));
+                                return;
+                            }
                             if (JSNES.Utils.isIE()) {
                                 var charCodes = JSNESBinaryToArray(
                                     xhr.responseBody
                                 ).toArray();
-                                data = String.fromCharCode.apply(
+                                romData = String.fromCharCode.apply(
                                     undefined,
                                     charCodes
                                 );
-                            } else {
-                                data = xhr.responseText;
+                            } else if (typeof xhr.responseText !== "undefined") {
+                                romData = xhr.responseText;
                             }
-                            self.nes.loadRom(data);
+                            self.nes.loadRom(romData);
                             self.nes.start();
                             self.enable();
+                        },
+                        error: function(xhr, textStatus, errorThrown) {
+                            self.updateStatus(romLoadHelpers.getRomLoadErrorMessage({
+                                protocol: window.location.protocol,
+                                url: romUrl,
+                                status: xhr && typeof xhr.status === "number" ? xhr.status : 0,
+                                textStatus: textStatus || errorThrown || "error"
+                            }));
                         }
                     });
                 },
