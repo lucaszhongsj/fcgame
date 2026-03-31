@@ -4,17 +4,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const repoRoot = path.resolve(__dirname, '..');
-const bundledRomRepo = 'nes-open-db';
-const bundledRomDir = path.join(repoRoot, 'roms', bundledRomRepo);
-const expectedBundledRoms = [
-    'kubo.nes',
-    'megamountain.nes',
-    'melojellos2.nes',
-    'nesert-golfing.nes',
-    'robo-ninja-climb.nes',
-    'spacey-mcracey.nes',
-    'super-homebrew-war.nes'
-];
+const romSourcesConfigPath = path.join(repoRoot, 'rom-sources.json');
+const fetchScriptPath = path.join(repoRoot, 'scripts', 'fetch-roms.sh');
+const runtimeAssetsWorkflowPath = path.join(repoRoot, '.github', 'workflows', 'runtime-assets-sync.yml');
 
 function readFile(relativePath) {
     return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -29,28 +21,34 @@ test('合规: 仓库必须提供 GPL 许可证文件', () => {
     assert.match(license, /Version 3/i, 'LICENSE 应为 GPLv3');
 });
 
-test('合规: 仅允许内置白名单 ROM 文件', () => {
-    assert.equal(fs.existsSync(bundledRomDir), true, 'roms/nes-open-db 目录必须存在');
+test('ROM 配置: 必须提供 rom-sources.json', () => {
+    assert.equal(fs.existsSync(romSourcesConfigPath), true, '缺少 rom-sources.json');
 
-    const romFiles = fs.readdirSync(bundledRomDir).filter((name) => /\.nes$/i.test(name)).sort();
-    assert.deepEqual(romFiles, expectedBundledRoms, 'roms/nes-open-db 目录中的 ROM 必须与白名单一致');
+    const config = JSON.parse(fs.readFileSync(romSourcesConfigPath, 'utf8'));
+    assert.equal(Array.isArray(config.sources), true, 'rom-sources.json 必须包含 sources 数组');
+    assert.equal(config.sources.length > 0, true, 'sources 不能为空');
 });
 
-test('合规: index.html 仅可引用白名单内置 ROM', () => {
+test('ROM 拉取: 必须提供 fetch-roms.sh 脚本', () => {
+    assert.equal(fs.existsSync(fetchScriptPath), true, '缺少 scripts/fetch-roms.sh');
+});
+
+test('CI: 必须提供 runtime-assets 同步工作流', () => {
+    assert.equal(fs.existsSync(runtimeAssetsWorkflowPath), true, '缺少 runtime-assets-sync.yml');
+    const workflowSource = fs.readFileSync(runtimeAssetsWorkflowPath, 'utf8');
+    assert.match(workflowSource, /runtime-assets/, '工作流应包含 runtime-assets 分支同步');
+    assert.match(workflowSource, /--force/, '工作流应使用 force push 覆盖冲突');
+});
+
+test('ROM 加载: index.html 应使用清单动态加载', () => {
     const indexHtml = readFile('index.html');
-    const matched = indexHtml.match(/roms\/nes-open-db\/[^'"]+\.nes/g) || [];
-    const unique = Array.from(new Set(matched.map((item) => item.replace('roms/nes-open-db/', '')))).sort();
-    assert.deepEqual(unique, expectedBundledRoms, 'index.html 只允许引用白名单 ROM');
-});
-
-test('合规: 白名单 ROM 必须存在版权与来源清单', () => {
-    const manifestPath = path.join(repoRoot, 'roms', 'WHITELIST.md');
-    assert.equal(fs.existsSync(manifestPath), true, '缺少 roms/WHITELIST.md');
-
-    const manifest = fs.readFileSync(manifestPath, 'utf8');
-    for (const rom of expectedBundledRoms) {
-        assert.match(manifest, new RegExp(rom.replace('.', '\\.')), `WHITELIST.md 必须记录 ${rom}`);
-    }
+    assert.equal(
+        indexHtml.includes('"Homebrew ROM": ['),
+        false,
+        '不应在 index.html 中硬编码 ROM 列表'
+    );
+    assert.match(indexHtml, /source\/rom_catalog_loader\.js/, '应引入 rom_catalog_loader.js');
+    assert.match(indexHtml, /roms\/index\.json/, '应读取 roms/index.json');
 });
 
 test('功能: UI 提供本地导入 ROM 文件能力', () => {
