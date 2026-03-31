@@ -1,0 +1,52 @@
+{
+  "sources": [
+    {
+      "source_repo": "nes-open-db",
+      "display_name": "Homebrew (nes-open-db)",
+      "items": [
+        {
+          "name": "megamountain",
+          "display_name": "Mega Mountain",
+          "rom_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/megamountain/megamountain.nes",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/megamountain/LICENSE.txt"
+        },
+        {
+          "name": "melojellos2",
+          "display_name": "Melojellos 2",
+          "rom_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/melojellos2/melojellos2.nes",
+          "license": "CC BY-SA 4.0",
+          "license_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/melojellos2/LICENSE.txt"
+        },
+        {
+          "name": "nesert-golfing",
+          "display_name": "Nesert Golfing",
+          "rom_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/nesert-golfing/nesert-golfing.nes",
+          "license": "CC BY 4.0",
+          "license_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/nesert-golfing/LICENSE.txt"
+        },
+        {
+          "name": "robo-ninja-climb",
+          "display_name": "Robo-Ninja Climb",
+          "rom_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/robo-ninja-climb/robo-ninja-climb.nes",
+          "license": "CC BY-NC-ND 3.0",
+          "license_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/robo-ninja-climb/LICENSE.txt"
+        },
+        {
+          "name": "spacey-mcracey",
+          "display_name": "Spacey Mcracey",
+          "rom_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/spacey-mcracey/spacey-mcracey.nes",
+          "license": "CC BY-NC-ND 3.0",
+          "license_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/spacey-mcracey/LICENSE.txt"
+        },
+        {
+          "name": "super-homebrew-war",
+          "display_name": "Super Homebrew War",
+          "rom_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/super-homebrew-war/super-homebrew-war.nes",
+          "license": "CC BY-NC-ND 3.0",
+          "license_url": "https://raw.githubusercontent.com/nes-open-db/nes-open-db/master/roms/super-homebrew-war/LICENSE.txt"
+        }
+      ]
+    }
+  ]
+}
