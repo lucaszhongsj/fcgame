@@ -134,4 +134,5 @@ docker run --rm -p 8080:80 fcgame:local
 浏览器访问：`http://localhost:8080`
 
 ## Star History
-[![Star History Chart](https://api.star-history.com/svg?repos=lucaschungzsj/fcgame&type=Date)](https://star-history.com/#lucaschungzsj/fcgame&Date)
+
+[![Star History Chart](https://api.star-history.com/image?repos=lucaszhongsj/fcgame&type=date&legend=top-left)](https://www.star-history.com/?repos=lucaszhongsj%2Ffcgame&type=date&legend=top-left)
