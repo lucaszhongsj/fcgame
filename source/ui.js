@@ -45,6 +45,7 @@ if (typeof jQuery !== 'undefined') {
                 }
                 self.romContainer = $('<div class="nes-roms"></div>').appendTo(self.root);
                 self.romSelect = $('<select></select>').appendTo(self.romContainer);
+                self.localRomInput = $('<input type="file" class="nes-local-rom-input" accept=".nes,application/octet-stream">').appendTo(self.romContainer);
                 self.controls = $('<div class="nes-controls"></div>').appendTo(self.root);
                 self.buttons = {
                     pause: $('<input type="button" value="暂停" class="nes-pause" disabled>').appendTo(self.controls),
@@ -59,6 +60,12 @@ if (typeof jQuery !== 'undefined') {
                  */
                 self.romSelect.change(function() {
                     self.loadROM();
+                });
+                self.localRomInput.bind("change", function() {
+                    if (this.files && this.files.length > 0) {
+                        self.loadLocalROM(this.files[0]);
+                    }
+                    this.value = "";
                 });
 
                 /*
@@ -555,6 +562,36 @@ if (typeof jQuery !== 'undefined') {
                     });
                 },
 
+                loadLocalROM: function(file) {
+                    var self = this;
+                    if (!file) {
+                        self.updateStatus("未选择本地 ROM 文件。");
+                        return;
+                    }
+                    if (typeof FileReader === "undefined") {
+                        self.updateStatus("当前浏览器不支持本地文件读取，请更换浏览器后重试。");
+                        return;
+                    }
+
+                    var reader = new FileReader();
+                    reader.onload = function(event) {
+                        var binaryContent = UI.arrayBufferToBinaryString(event.target && event.target.result);
+                        if (!binaryContent) {
+                            self.updateStatus("本地 ROM 读取失败：文件内容为空或格式不支持。");
+                            return;
+                        }
+                        self.nes.loadRom(binaryContent);
+                        self.nes.start();
+                        self.enable();
+                        self.updateStatus("本地 ROM 已加载：" + file.name);
+                    };
+                    reader.onerror = function() {
+                        self.updateStatus("本地 ROM 读取失败：" + file.name);
+                    };
+                    self.updateStatus("正在读取本地 ROM：" + file.name);
+                    reader.readAsArrayBuffer(file);
+                },
+
                 resetCanvas: function() {
                     this.canvasContext.fillStyle = 'black';
                     // set alpha to opaque
@@ -666,6 +703,20 @@ if (typeof jQuery !== 'undefined') {
 
                     this.canvasContext.putImageData(this.canvasImageData, 0, 0);
                 }
+            };
+
+            UI.arrayBufferToBinaryString = function(buffer) {
+                if (!buffer || typeof Uint8Array === "undefined") {
+                    return "";
+                }
+                var bytes = new Uint8Array(buffer);
+                var chunkSize = 0x8000;
+                var result = "";
+                for (var offset = 0; offset < bytes.length; offset += chunkSize) {
+                    var chunk = bytes.subarray(offset, offset + chunkSize);
+                    result += String.fromCharCode.apply(null, chunk);
+                }
+                return result;
             };
 
             return UI;
