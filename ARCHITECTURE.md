@@ -14,12 +14,12 @@ FCGame 是一个基于 JSNES 二次开发的前端静态模拟器项目：
 1. 表现层：`index.html` + `css/jsnes.css`
 2. 交互与桥接层：`source/ui.js` + `source/keyboard.js` + `lib/joystick.js`
 3. 仿真核心层：`source/nes.js` + `cpu.js` + `ppu.js` + `papu.js` + `rom.js` + `mappers.js`
-4. 资源层：`roms/`、`static/`
+4. 资源层：`roms/`（不内置商业 ROM，内置合规白名单 homebrew ROM）、`static/`
 
 ## 3. 运行主链路
 
 1. 页面加载脚本并初始化 `JSNES`
-2. 通过 UI 选择 ROM 并下载 `.nes`
+2. 通过 UI 选择远程 ROM 或本地导入 `.nes`
 3. `rom.js` 解析 iNES 头并创建 mapper
 4. `nes.frame()` 驱动 CPU/PPU/APU 帧循环
 5. 画面写入 canvas，声音写入 WebAudio/回退通道

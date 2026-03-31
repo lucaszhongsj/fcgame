@@ -1,14 +1,23 @@
 # FCGame 项目全量理解与维护手册
 
-> 更新时间：2026-03-19  
+> 更新时间：2026-03-31  
 > 仓库路径：`/Users/lucas/github.com/lucaszhongsj/fcgame`  
 > 目标：为后续维护、重构、问题排查提供统一事实基线
 
 ## 1. 一句话结论
 
 这是一个基于 JSNES 二次开发的纯静态网页 FC/NES 模拟器项目：入口在
-`index.html`，仿真内核在 `source/`，第三方依赖在 `lib/`，游戏 ROM 在
-`roms/`，当前无构建系统、无测试系统、无后端服务代码。
+`index.html`，仿真内核在 `source/`，第三方依赖在 `lib/`，ROM 目录在
+`roms/`（不内置商业 ROM，内置少量白名单 homebrew ROM），当前无构建
+系统、无后端服务代码，包含基于 `node --test` 的最小自动化测试集。
+
+### 1.1 2026-03-31 合规变更（增量）
+
+- 仓库已移除 `roms/` 下全部内置 `.nes` 文件，不再分发商业 ROM。
+- 页面新增“本地导入 ROM”能力，用户可选择本地 `.nes` 文件直接加载。
+- 新增合规文档：
+  - 根目录 `ROM_POLICY.md`
+  - `docs/design-docs/rom-copyright-audit-2026-03-31.md`
 
 ## 2. 项目快照（当前仓库状态）
 
@@ -17,7 +26,7 @@
 - `css/`：1 个文件，约 8KB
 - `lib/`：8 个文件，约 224KB
 - `source/`：9 个文件，约 264KB
-- `roms/`：67 个 `.nes` 文件，约 8.2MB
+- `roms/`：白名单 homebrew `.nes` + 许可证文件 + 说明文档
 - `static/`：4 个文件，约 324KB
 - `.idea/`：IDE 工程配置（不参与运行）
 
@@ -40,7 +49,7 @@
 - `index.html`
   - 页面结构、脚本装配顺序、ROM 分类数据、摇杆实例初始化。
 - `README.md`
-  - 对外说明、按键说明、ROM 列表（与 `index.html` 存在重复维护）。
+  - 对外说明、按键说明、开源协议与 ROM 合规使用说明。
 - `.gitignore`
   - 通用忽略规则，含前端常见目录。
 
@@ -65,10 +74,11 @@
 - `jsnes-ie-hacks.vbscript`：IE 二进制 ROM 读取补丁
 - `debug.js`：反调试逻辑（会持续 `debugger`）
 
-### 3.4 `roms/`（游戏数据层）
+### 3.4 `roms/`（ROM 合规分发层）
 
-- 67 个 ROM 文件，`index.html` ROM 下拉配置与实际文件数量一致。
-- 分类展示逻辑依赖 `index.html` 内联的大对象配置。
+- 默认不分发商业 ROM，仅分发白名单 homebrew ROM。
+- 每个内置 ROM 都需要附带许可证与来源清单。
+- 用户仍可通过页面“本地导入 ROM”加载其他合法持有的 ROM。
 
 ### 3.5 `css/` 与 `static/`
 
@@ -92,7 +102,7 @@
 9. `source/ppu.js`
 10. `source/rom.js`
 11. `source/ui.js`
-12. `lib/debug.js`
+12. 条件加载 `lib/debug.js`（仅 `antiDebug=1`）
 13. `lib/nipplejs.min.js`
 14. `lib/joystick.js`
 15. `lib/jweixin-1.6.0.js`
@@ -108,13 +118,14 @@
 
 ### 4.3 ROM 加载时序
 
-1. 用户在下拉框选择 ROM
-2. `ui.js` 的 `loadROM()` 通过 AJAX 拉取 `.nes` 文件
-3. `nes.loadRom(data)` 创建 `JSNES.ROM` 并解析 iNES 头
-4. `rom.createMapper()` 创建 mapper 实例
-5. `mmap.loadROM()` 装载 PRG/CHR 到 CPU/PPU
-6. `ppu.setMirroring()` 设置镜像方式
-7. `nes.start()` 启动帧循环
+1. 用户选择远程 ROM（可选）或通过文件框本地导入 `.nes`
+2. 远程模式：`ui.js` 的 `loadROM()` 通过 AJAX 拉取 `.nes` 文件
+3. 本地模式：`ui.js` 的 `loadLocalROM()` 通过 `FileReader` 读取文件
+4. `nes.loadRom(data)` 创建 `JSNES.ROM` 并解析 iNES 头
+5. `rom.createMapper()` 创建 mapper 实例
+6. `mmap.loadROM()` 装载 PRG/CHR 到 CPU/PPU
+7. `ppu.setMirroring()` 设置镜像方式
+8. `nes.start()` 启动帧循环
 
 ### 4.4 帧循环时序
 
