@@ -46,6 +46,8 @@ jobs:
 
           git checkout -B runtime-assets
           git add -A
+          git add -f download-report.json roms/index.json
+          find roms -mindepth 2 -maxdepth 2 -name manifest.json -print0 | xargs -0 -r git add -f
           git commit -m "chore: sync runtime assets from main ${GITHUB_SHA}" || true
 
           git push "https://x-access-token:${RUNTIME_ASSETS_PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" runtime-assets --force
