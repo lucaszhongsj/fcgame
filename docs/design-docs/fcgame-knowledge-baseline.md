@@ -1,6 +1,6 @@
 # FCGame 项目全量理解与维护手册
 
-> 更新时间：2026-03-31  
+> 更新时间：2026-04-01  
 > 仓库路径：`/Users/lucas/github.com/lucaszhongsj/fcgame`  
 > 目标：为后续维护、重构、问题排查提供统一事实基线
 
@@ -8,7 +8,7 @@
 
 这是一个基于 JSNES 二次开发的纯静态网页 FC/NES 模拟器项目：入口在
 `index.html`，仿真内核在 `source/`，第三方依赖在 `lib/`，ROM 目录在
-`roms/`（不内置商业 ROM，内置少量白名单 homebrew ROM），当前无构建
+`roms/`（不内置商业 ROM，ROM 列表由 `roms/index.json` 动态驱动），当前无构建
 系统、无后端服务代码，包含基于 `node --test` 的最小自动化测试集。
 
 ### 1.1 2026-03-31 合规变更（增量）
@@ -19,14 +19,21 @@
   - 根目录 `ROM_POLICY.md`
   - `docs/design-docs/rom-copyright-audit-2026-03-31.md`
 
+### 1.2 2026-04-01 ROM 动态清单变更（增量）
+
+- `index.html` 移除硬编码 ROM 列表，改为读取 `roms/index.json`。
+- 新增 `source/rom_catalog_loader.js`，负责拉取与组装 ROM 分组数据。
+- 新增 `scripts/fetch-roms.sh` 与 `rom-sources.json`，通过配置生成 ROM 清单与下载报告。
+- 约定 `runtime-assets` 为运行时资源派生分支，由 GitHub Actions 覆盖同步。
+
 ## 2. 项目快照（当前仓库状态）
 
 ### 2.1 目录与资源规模
 
 - `css/`：1 个文件，约 8KB
 - `lib/`：8 个文件，约 224KB
-- `source/`：9 个文件，约 264KB
-- `roms/`：白名单 homebrew `.nes` + 许可证文件 + 说明文档
+- `source/`：10 个文件（新增 ROM 清单加载器）
+- `roms/`：按来源仓库存放 `.nes` 与 `manifest.json`，并包含 `index.json`
 - `static/`：4 个文件，约 324KB
 - `.idea/`：IDE 工程配置（不参与运行）
 
@@ -47,7 +54,7 @@
 ### 3.1 根目录
 
 - `index.html`
-  - 页面结构、脚本装配顺序、ROM 分类数据、摇杆实例初始化。
+  - 页面结构、脚本装配顺序、ROM 动态清单加载入口、摇杆实例初始化。
 - `README.md`
   - 对外说明、按键说明、开源协议与 ROM 合规使用说明。
 - `.gitignore`
@@ -62,6 +69,7 @@
 - `rom.js`：iNES 文件解析与 mapper 选择
 - `mappers.js`：地址映射、PRG/CHR bank 切换、手柄寄存器读写
 - `ui.js`：jQuery UI 插件（ROM 下拉、画布、键盘/触控、音频输出桥接）
+- `rom_catalog_loader.js`：ROM 清单拉取与分组转换（`roms/index.json` -> `JSNESUI` 配置）
 - `keyboard.js`：按键状态机（P1/P2）
 - `utils.js`：数组复制、JSON 辅助、IE 判断
 
@@ -74,10 +82,10 @@
 - `jsnes-ie-hacks.vbscript`：IE 二进制 ROM 读取补丁
 - `debug.js`：反调试逻辑（会持续 `debugger`）
 
-### 3.4 `roms/`（ROM 合规分发层）
+### 3.4 `roms/`（ROM 资源目录层）
 
-- 默认不分发商业 ROM，仅分发白名单 homebrew ROM。
-- 每个内置 ROM 都需要附带许可证与来源清单。
+- ROM 按来源仓库名分目录（如 `roms/<source_repo>/`）。
+- 每个来源目录包含 `manifest.json`，顶层由 `roms/index.json` 汇总。
 - 用户仍可通过页面“本地导入 ROM”加载其他合法持有的 ROM。
 
 ### 3.5 `css/` 与 `static/`
@@ -102,19 +110,22 @@
 9. `source/ppu.js`
 10. `source/rom.js`
 11. `source/ui.js`
-12. 条件加载 `lib/debug.js`（仅 `antiDebug=1`）
-13. `lib/nipplejs.min.js`
-14. `lib/joystick.js`
-15. `lib/jweixin-1.6.0.js`
+12. `source/rom_catalog_loader.js`
+13. 条件加载 `lib/debug.js`（仅 `antiDebug=1`）
+14. `lib/nipplejs.min.js`
+15. `lib/joystick.js`
+16. `lib/jweixin-1.6.0.js`
 
 说明：这是典型“全局变量 + 顺序依赖”结构，随意调整顺序会导致运行失败。
 
 ### 4.2 初始化时序
 
-1. `$(function(){ ... })` 创建 `nes = new JSNES({ ui: $('#emulator').JSNESUI(...) })`
+1. `$(function(){ ... })` 创建 `nes = new JSNES({ ui: $('#emulator').JSNESUI({}) })`
 2. `JSNES` 构造中依次创建 `CPU`、`PPU`、`PAPU`、`Keyboard`
-3. `JSNESUI` 初始化画布、ROM 下拉、按钮、键盘和触控事件
-4. 页面底部初始化 `Joystick`，将摇杆动作转成虚拟按键事件
+3. `FCGameRomCatalog.loadCatalog('roms/index.json')` 拉取来源索引与 manifest
+4. `JSNESUI` 初始化画布、ROM 下拉、按钮、键盘和触控事件
+5. 清单加载完成后调用 `nes.ui.setRoms(...)` 注入分组列表
+6. 页面底部初始化 `Joystick`，将摇杆动作转成虚拟按键事件
 
 ### 4.3 ROM 加载时序
 
@@ -303,9 +314,9 @@ Mapper5 分支引用了若干当前仓库中未定义成员/方法，例如：
 
 ### 8.1 新增 ROM
 
-1. 将 `.nes` 文件放入 `roms/`
-2. 在 `index.html` 的 ROM 分类对象中增加条目
-3. （可选）同步更新 README ROM 列表
+1. 在 `rom-sources.json` 增加来源与条目配置（`name`、`rom_url` 必填）
+2. 执行 `bash scripts/fetch-roms.sh rom-sources.json`
+3. 检查生成的 `roms/index.json` 与 `roms/<source_repo>/manifest.json`
 4. 在手机和桌面各验证一次启动、输入、画面、声音
 
 ### 8.2 修改按键映射
@@ -325,7 +336,8 @@ Mapper5 分支引用了若干当前仓库中未定义成员/方法，例如：
 
 1. 用静态文件服务运行，不建议直接双击 `index.html`
 2. 调试期间建议临时禁用 `lib/debug.js` 引用
-3. 排查输入问题时优先看 `keyboard.js` 的 `setKey` 是否命中
+3. 排查 ROM 列表问题时优先检查 `roms/index.json` 与对应 `manifest.json`
+4. 排查输入问题时优先看 `keyboard.js` 的 `setKey` 是否命中
 
 ## 9. 推荐改造路线（分阶段）
 
@@ -337,7 +349,7 @@ Mapper5 分支引用了若干当前仓库中未定义成员/方法，例如：
 
 ### P1（结构性降复杂度）
 
-1. 抽离 `index.html` ROM 大对象为独立配置文件
+1. 为 `rom_catalog_loader.js` 增加缓存与超时重试策略
 2. 梳理 UI 事件路径，拆分为“桌面键盘/移动按钮/摇杆”三个清晰模块
 3. 对 mapper 支持做明确分级（稳定/实验/未完成）
 

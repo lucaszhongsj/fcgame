@@ -67,6 +67,7 @@
 <script src="source/ppu.js" type="text/javascript" charset="utf-8"></script>
 <script src="source/rom.js" type="text/javascript" charset="utf-8"></script>
 <script src="source/ui.js" type="text/javascript" charset="utf-8"></script>
+<script src="source/rom_catalog_loader.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript" charset="utf-8">
     (function() {
         if (window.location.search.indexOf("antiDebug=1") === -1) {
@@ -86,17 +87,17 @@
     var nes;
     $(function() {
         nes = new JSNES({
-            'ui': $('#emulator').JSNESUI({
-                "Homebrew ROM": [
-                    ['Kubo', 'roms/nes-open-db/kubo.nes'],
-                    ['Mega Mountain', 'roms/nes-open-db/megamountain.nes'],
-                    ['Melojellos 2', 'roms/nes-open-db/melojellos2.nes'],
-                    ['Nesert Golfing', 'roms/nes-open-db/nesert-golfing.nes'],
-                    ['Robo-Ninja Climb', 'roms/nes-open-db/robo-ninja-climb.nes'],
-                    ['Spacey Mcracey', 'roms/nes-open-db/spacey-mcracey.nes'],
-                    ['Super Homebrew War', 'roms/nes-open-db/super-homebrew-war.nes']
-                ]
-            })
+            'ui': $('#emulator').JSNESUI({})
+        });
+
+        FCGameRomCatalog.loadCatalog('roms/index.json', {
+            onSuccess: function(romsConfig) {
+                nes.ui.setRoms(romsConfig);
+                nes.ui.updateStatus('ROM 清单已加载。');
+            },
+            onError: function() {
+                nes.ui.updateStatus('ROM 清单加载失败，可使用本地导入 ROM。');
+            }
         });
     });
 </script>

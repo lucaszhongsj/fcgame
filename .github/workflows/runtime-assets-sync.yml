@@ -1,0 +1,53 @@
+name: runtime-assets-sync
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: runtime-assets-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure jq exists
+        run: |
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+
+      - name: Fetch ROM assets and generate manifests
+        run: bash scripts/fetch-roms.sh rom-sources.json
+
+      - name: Push runtime-assets branch (force sync)
+        env:
+          RUNTIME_ASSETS_PUSH_TOKEN: ${{ secrets.RUNTIME_ASSETS_PUSH_TOKEN }}
+        run: |
+          if [ -z "${RUNTIME_ASSETS_PUSH_TOKEN}" ]; then
+            echo "RUNTIME_ASSETS_PUSH_TOKEN is required"
+            exit 1
+          fi
+
+          git config user.name "runtime-assets-bot"
+          git config user.email "runtime-assets-bot@users.noreply.github.com"
+
+          git checkout -B runtime-assets
+          git add -A
+          git add -f download-report.json roms/index.json
+          find roms -mindepth 2 -maxdepth 2 -name manifest.json -print0 | xargs -0 -r git add -f
+          git commit -m "chore: sync runtime assets from main ${GITHUB_SHA}" || true
+
+          git push "https://x-access-token:${RUNTIME_ASSETS_PUSH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" runtime-assets --force
